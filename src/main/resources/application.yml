@@ -1,0 +1,100 @@
+# Application Configuration
+spring:
+  application:
+    name: charting-api
+    description: TimescaleDB-based charting API for health metrics
+    version: 1.0.0
+  
+  # Database Configuration
+  datasource:
+    url: jdbc:postgresql://localhost:5432/sapphire
+    username: admin
+    password: admin123
+    driver-class-name: org.postgresql.Driver
+    
+    # HikariCP Connection Pool Configuration
+    hikari:
+      maximum-pool-size: 10
+      minimum-idle: 5
+      connection-timeout: 30000
+      idle-timeout: 600000
+      max-lifetime: 1800000
+      pool-name: ChartingAPIPool
+  
+  # Jackson Configuration
+  jackson:
+    serialization:
+      write-dates-as-timestamps: false
+    time-zone: UTC
+    default-property-inclusion: non_null
+  
+  # Security Configuration
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          jwk-set-uri: http://localhost:8090/realms/saphhire-ui/protocol/openid-connect/certs
+          issuer-uri: http://localhost:8090/realms/saphhire-ui
+
+# Application-specific Configuration
+app:
+  database:
+    schema: public
+  security:
+    required-scopes:
+      - email
+      - profile
+
+# Server Configuration
+server:
+  port: 8089
+
+# Logging Configuration
+logging:
+  level:
+    root: INFO
+    com.health.charting: DEBUG
+    org.springframework.jdbc: DEBUG
+  pattern:
+    console: "%d{yyyy-MM-dd HH:mm:ss} [%thread] %-5level %logger{36} - %msg%n"
+    file: "%d{yyyy-MM-dd HH:mm:ss} [%thread] %-5level %logger{36} - %msg%n"
+
+# OpenAPI/Swagger Configuration
+springdoc:
+  api-docs:
+    path: /v3/api-docs
+    enabled: true
+  swagger-ui:
+    path: /swagger-ui.html
+    operations-sorter: method
+    tags-sorter: alpha
+    enabled: true
+
+# Made with Bob
+
+# Actuator and Metrics Configuration
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics,prometheus
+      base-path: /actuator
+  endpoint:
+    health:
+      show-details: always
+    metrics:
+      enabled: true
+    prometheus:
+      enabled: true
+  metrics:
+    export:
+      prometheus:
+        enabled: true
+    tags:
+      application: ${spring.application.name}
+      environment: ${ENVIRONMENT:dev}
+    distribution:
+      percentiles-histogram:
+        http.server.requests: true
+        charting.api.query.duration: true
+        charting.api.database.query.duration: true
