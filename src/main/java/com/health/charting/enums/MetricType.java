@@ -14,7 +14,8 @@ public enum MetricType {
     BLOODPRESSURE("bloodpressure"),
     SLEEP("sleep"),
     ACTIVITY("activity"),
-    WORKOUT("workout");
+    WORKOUT("workout"),
+    TEMPERATURE("temperature");
 
     private final String tableName;
 
